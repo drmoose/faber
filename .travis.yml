@@ -1,5 +1,9 @@
 language: python
 
+branches:
+  except:
+  - appveyor-ci
+
 matrix:
   include:
     - os: linux

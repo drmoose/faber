@@ -1,3 +1,7 @@
+branches:
+  except:
+    - travis-ci
+
 environment:
   global:
     # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
@@ -27,4 +31,5 @@ build: off
 test_script:
   - set PYTHONPATH=%cd%\\src
   - "%CMD_IN_ENV% python scripts\\faber --info=tools cxx"
-  - "%CMD_IN_ENV% py.test --compiler=native -v"
+  - python scripts\\faber --srcdir=examples\\implicit_rules --log=actions --log=commands hello1
+  #- "%CMD_IN_ENV% py.test --faber-log=commands --faber-log=actions -s --compiler=native -v"
