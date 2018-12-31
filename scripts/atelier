@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+#
+# Copyright (c) 2018 Stefan Seefeld
+# All rights reserved.
+#
+# This file is part of Faber. It is made available under the
+# Boost Software License, Version 1.0.
+# (Consult LICENSE or http://www.boost.org/LICENSE_1_0.txt)
+
+import atelier
+import faber
+import argparse
+
+
+def make_parser(prog='atelier'):
+
+    parser = argparse.ArgumentParser(prog=prog,
+                                     description='Atelier is a construction tool.')
+    parser.add_argument('builddir', nargs='?',
+                        help='the location of the build directory')
+    parser.add_argument('-s', '--srcdir',
+                        help='the location of the source directory')
+    parser.add_argument('--rc', default=None,
+                        help='the location of the rc file')
+    parser.add_argument('-v', '--version', action='store_true',
+                        help='report version and exit')
+    parser.add_argument('--debug', action='store_true',
+                        help='do not suppress traceback on error')
+    return parser
+
+
+def main(argv):
+
+    parser = make_parser(argv[0])
+    try:
+        args = parser.parse_args(argv[1:])
+        if args.version:
+            print('Atelier (Faber) version {}'.format(atelier.version))
+            return True
+        if args.debug:
+            faber.debug = True
+        return atelier.run(args.builddir, args.srcdir, args.rc)
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        if args.debug:
+            raise
+        else:
+            print('Error: {}'.format(e))
+        return False
+    return True
+
+
+if __name__ == '__main__':
+
+    import sys
+    sys.exit(0 if main(sys.argv) else 1)

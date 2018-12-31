@@ -7,7 +7,7 @@
 # Boost Software License, Version 1.0.
 # (Consult LICENSE or http://www.boost.org/LICENSE_1_0.txt)
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.extension import Extension
 from distutils.command import build, install_scripts, install_data, sdist
 import sys, os, os.path, glob, shutil
