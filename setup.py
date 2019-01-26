@@ -7,7 +7,8 @@
 # Boost Software License, Version 1.0.
 # (Consult LICENSE or http://www.boost.org/LICENSE_1_0.txt)
 
-from distutils.core import setup, Extension
+from setuptools import setup, find_packages
+from setuptools.extension import Extension
 from distutils.command import build, install_scripts, install_data, sdist
 import sys, os, os.path, glob, shutil
 import subprocess
@@ -38,7 +39,7 @@ bjam = Extension(name='faber.scheduler._bjam',
                                 ('OPT_SEMAPHORE', None),
                                 ('OPT_GRAPH_DEBUG_EXT', None)],
                  libraries=libraries)
-scripts = ['scripts/faber']
+ext_modules = [bjam] if sys.version_info < (3,6,0) else []
 data = [('share/doc/faber-{}'.format(version), ('LICENSE', 'README.md'))]
 
 def find_packages(root_dir, root_name):
@@ -97,35 +98,6 @@ if os.path.exists('doc/html'):
                     [os.path.join(root, file) for file in files
                      if os.path.isfile(os.path.join(root, file))]))
 
-class install_faber(install_scripts.install_scripts):
-
-    bat = r"""@echo off
-REM wrapper to use shebang first line of {FNAME}
-set mypath=%~dp0
-set pyscript="%mypath%{FNAME}"
-set /p line1=<%pyscript%
-if "%line1:~0,2%" == "#!" (goto :goodstart)
-echo First line of %pyscript% does not start with "#!"
-exit /b 1
-:goodstart
-set py_exe=%line1:~2%
-call "%py_exe%" %pyscript% %*
-"""
-
-    def run(self):
-        install_scripts.install_scripts.run(self)
-        if os.name != 'nt':  # done
-            return
-        for filepath in self.get_outputs():
-            pth, fname = os.path.split(filepath)
-            froot, ext = os.path.splitext(fname)
-            bat_file = os.path.join(pth, froot + '.bat')
-            bat_contents = install_faber.bat.format(FNAME=fname)
-            if self.dry_run:
-                continue
-            with open(bat_file, 'wt') as fobj:
-                fobj.write(bat_contents)
-
 class test(build.build):
 
    description = "run tests"
@@ -157,12 +129,11 @@ setup(name='faber',
                      'Programming Language :: C'],
       cmdclass={'build_doc': build_doc,
                 'install_data': finstall_data,
-                'install_scripts': install_faber,
                 'test': test,
                 'sdist': fsdist},
       package_dir={'':'src'},
       packages=find_packages('src/faber', 'faber'),
-      ext_modules=[bjam],
-      scripts=scripts,
+      ext_modules=ext_modules,
+      scripts=['scripts/faber'],
       data_files=data + docs,
       )
