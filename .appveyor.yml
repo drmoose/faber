@@ -18,6 +18,7 @@ install:
   - curl -LfsS -o vswhere.exe https://github.com/Microsoft/vswhere/releases/download/2.3.7/vswhere.exe
   - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "%CMD_IN_ENV% pip install -U pytest pytest-asyncio mock six pyyaml"
+  - cmd: copy .ci\\appveyor-faber %userprofile%\\.faber
 
 # At this point we are only building and testing the asyncio-based scheduler on Windows.
 build: off
@@ -27,4 +28,5 @@ build: off
 test_script:
   - set PYTHONPATH=%cd%\\src
   - "%CMD_IN_ENV% python scripts\\faber --info=tools cxx"
+  - "%CMD_IN_ENV% py.test --compiler=gcc -v"
   - "%CMD_IN_ENV% py.test --compiler=native -v"
