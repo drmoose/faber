@@ -16,7 +16,10 @@ from .error import error_reporter
 from .utils import aslist
 from . import config as C
 import logging
-from configparser import ConfigParser
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser
 import warnings
 from os.path import exists, join, abspath
 import shutil
